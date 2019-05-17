@@ -14,6 +14,7 @@ type Certinel struct {
 	certificate atomic.Value // *tls.Certificate
 	watcher     Watcher
 	errBack     func(error)
+	logBack     func(string, ...interface{})
 }
 
 // Watchers provide a way to construct (and close!) channels that
@@ -25,14 +26,19 @@ type Watcher interface {
 
 // New creates a Certinel that watches for changes with the provided
 // Watcher.
-func New(w Watcher, errBack func(error)) *Certinel {
+func New(w Watcher, logBack func(string, ...interface{}), errBack func(error)) *Certinel {
 	if errBack == nil {
 		errBack = func(error) {}
+	}
+
+	if logBack == nil {
+		logBack = func(string, ...interface{}) {}
 	}
 
 	return &Certinel{
 		watcher: w,
 		errBack: errBack,
+		logBack: logBack,
 	}
 }
 
@@ -44,6 +50,7 @@ func (c *Certinel) Watch() {
 		for {
 			select {
 			case certificate := <-tlsChan:
+				c.logBack("Loading new certificate")
 				c.certificate.Store(&certificate)
 			case err := <-errChan:
 				c.errBack(err)

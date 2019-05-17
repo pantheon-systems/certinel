@@ -15,7 +15,7 @@ var interval = 5 * time.Second // NOTE: 5 seconds is fairly short for demonstrat
 
 func main() {
 	watcher := pollwatcher.New("tls.crt", "tls.key", interval)
-	sentinel := certinel.New(watcher, func(err error) {
+	sentinel := certinel.New(watcher, log.Printf, func(err error) {
 		log.Fatalf("error: certinel was unable to reload the certificate. err='%s'", err)
 	})
 

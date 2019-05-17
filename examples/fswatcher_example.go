@@ -14,7 +14,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("fatal: unable to read server certificate. err='%s'", err)
 	}
-	sentinel := certinel.New(watcher, func(err error) {
+	sentinel := certinel.New(watcher, log.Printf, func(err error) {
 		log.Printf("error: certinel was unable to reload the certificate. err='%s'", err)
 	})
 
